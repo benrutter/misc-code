@@ -1,16 +1,16 @@
-import keyboard
 import os
 import glob
 import sys
 import shutil
+import key_env
 
-banner1 = r'            _   __,   __   _   ,_    ' 
-banner2 = r'          |/ \_/  |  /    |/  /  |   ' 
+banner1 = r'            _   __,   __   _   ,_    '
+banner2 = r'          |/ \_/  |  /    |/  /  |   '
 banner3 = r'          |__/ \_/|_/\___/|__/   |_/ '
 banner4 = r'         /|                          '
 banner5 = r'         \|                          '
 banner = [banner1,banner2,banner3,banner4,banner5]
-                              
+
 selected = 0
 selection = []
 files = [f for f in glob.glob('*')]
@@ -29,7 +29,7 @@ def clear():
     else:
         os.system('clear')
 
-def show_menu(refresh_files=False):    
+def show_menu(refresh_files=False):
     global selected
     global files
     if refresh_files:
@@ -58,14 +58,14 @@ def show_menu(refresh_files=False):
 
     ### directory_list
 
-    selected_files = [s['file'] for s in selection if s['path'] == os.getcwd()] 
+    selected_files = [s['file'] for s in selection if s['path'] == os.getcwd()]
     curr_f = [f + ' ' * int(40-len(f)) if len(f) < 40 else '...' + f[-37:] for f in files]
-    
+
     prev_sel = [s['file'] for s in selection if s['path'] == os.path.abspath(os.path.join(os.getcwd(), os.pardir))]
     prev_f = [f for f in glob.glob('../*')]
     prev_f = [f.split('\\',1)[-1] for f in prev_f]
     prev_f = [f + ' ' * int(40-len(f)) if len(f) < 40 else '...' + f[-37:] for f in prev_f]
-    
+
     try:
         next_f = [f for f in glob.glob(files[min(max(0,selected),len(files)-1)] + '/*')]
         next_f = [f.split(splitter,1)[-1] for f in next_f]
@@ -78,7 +78,7 @@ def show_menu(refresh_files=False):
 
     selected = min(max(selected, 0),len(files)-1)
     file_range_trans = curr_f[max(0,selected-(dynamic_size-1)):]
-    file_range = range(0,dynamic_size) 
+    file_range = range(0,dynamic_size)
 
     for i in file_range:
 
@@ -152,7 +152,7 @@ def move(num):
     message = ''
     selected += num
     show_menu()
-    
+
 
 def left():
     global files
@@ -166,7 +166,7 @@ def left():
         pass
     files = [f for f in glob.glob('*')]
     show_menu()
-    
+
 def right():
     global files
     global message
@@ -178,7 +178,7 @@ def right():
     except:
         try:
             launch()
-        except: 
+        except:
             message = ' Launch / Nav Error'
     files = [f for f in glob.glob('*')]
     show_menu()
@@ -259,15 +259,17 @@ def exec_pacer():
     else:
         print(' No action taken')
 
+key_mapping = {
+    106: lambda: move(1),
+    107: lambda: move(-1),
+    108: right,
+    104: left,
+    63: exec_int,
+    59: exec_pacer,
+    32: select,
+    8: clear_selection,
+    113: quit
+}
 
 show_menu()
-keyboard.add_hotkey('down', lambda: move(1))
-keyboard.add_hotkey('up', lambda: move(-1))
-keyboard.add_hotkey('right', right)
-keyboard.add_hotkey('left', left)
-keyboard.add_hotkey('F5', exec_int)
-keyboard.add_hotkey('F1', exec_pacer)
-keyboard.add_hotkey('q', quit)
-keyboard.add_hotkey('Space', select)
-keyboard.add_hotkey('\b', clear_selection)
-keyboard.wait()
+key_env.run_environment(key_mapping, exit_feature=False)
