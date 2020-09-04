@@ -45,11 +45,11 @@ def show_menu(refresh_files=False):
     if big:
         for b in banner:
             print((' ' * 40) + (margin * int(2)) + b)
-        print(margin + 'Pacer is a console based file browser. Explore and launch with arrow keys. <F1> for pacer commands, <F5> for console commands. Select and clear selection with <Space> and <Backspace>. Exit with q')
+        print(margin + 'Pacer is a console based file browser. Explore and launch with vim keys. <F1> for pacer commands, <F5> for console commands. Select and clear selection with <Space> and <Backspace>. Exit with q')
         print(line)
     else:
         print(margin + 'Pacer')
-        print(margin + '- move with arrow keys')
+        print(margin + '- move with vim keys')
         print(margin + '- select and clear with <Space> and <Backspace>')
         print(margin + '- pacer command with <F1>')
         print(margin + '- run commands with <F5>')

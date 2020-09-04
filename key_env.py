@@ -1,4 +1,9 @@
-from msvcrt import getch
+import os
+
+if os.name == 'nt':
+    from msvcrt import getch
+else:
+    from getch import getch
 
 def run_environment(function_mapping, exit_feature=True):
     while True:
