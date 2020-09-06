@@ -1,14 +1,18 @@
+#!/usr/bin/python
+
 import os
 import glob
 import sys
 import shutil
 import key_env
 
-banner1 = r'            _   __,   __   _   ,_    '
-banner2 = r'          |/ \_/  |  /    |/  /  |   '
-banner3 = r'          |__/ \_/|_/\___/|__/   |_/ '
-banner4 = r'         /|                          '
-banner5 = r'         \|                          '
+banner1 = r"    ____"
+banner2 = r"   / __ \____ _________  _____"
+banner3 = r"  / /_/ / __ '/ __/ _  \/  __/"
+banner4 = r" / ____/ /_/ / /__   __/ /"
+banner5 = r"/_/    \__~_/\___/\___/_/"
+
+
 banner = [banner1,banner2,banner3,banner4,banner5]
 
 selected = 0
@@ -35,7 +39,7 @@ def show_menu(refresh_files=False):
     if refresh_files:
         files = [f for f in glob.glob('*')]
     term_columns = shutil.get_terminal_size().columns
-    big = term_columns > 200
+    big = term_columns >170
     if big:
         margin = ' ' * int(term_columns/10)
     else:
@@ -44,15 +48,15 @@ def show_menu(refresh_files=False):
     clear()
     if big:
         for b in banner:
-            print((' ' * 40) + (margin * int(2)) + b)
-        print(margin + 'Pacer is a console based file browser. Explore and launch with vim keys. <F1> for pacer commands, <F5> for console commands. Select and clear selection with <Space> and <Backspace>. Exit with q')
+            print(margin + b)
+        print(margin + 'Pacer is a console based file browser.\n' + margin + 'Explore and launch with vim keys. s for pacer commands, a for console commands.\n' + margin + 'Select and clear selection with f and d. Exit with q')
         print(line)
     else:
         print(margin + 'Pacer')
         print(margin + '- move with vim keys')
-        print(margin + '- select and clear with <Space> and <Backspace>')
-        print(margin + '- pacer command with <F1>')
-        print(margin + '- run commands with <F5>')
+        print(margin + '- select and clear with f and d')
+        print(margin + '- pacer command with s')
+        print(margin + '- run commands with a')
         print(margin + '- exit with q')
         print('')
 
@@ -264,10 +268,10 @@ key_mapping = {
     107: lambda: move(-1),
     108: right,
     104: left,
-    63: exec_int,
-    59: exec_pacer,
-    32: select,
-    8: clear_selection,
+    97: exec_int,
+    115: exec_pacer,
+    102: select,
+    100: clear_selection,
     113: quit
 }
 
