@@ -240,24 +240,29 @@ def clear_selection():
     selection = []
     show_menu(refresh_files = True)
 
-def move_file():
-    global files
-    cmd = input(' Move ' + str([s['path'] + splitter + s['file'] for s in selection]) + ' into current directory? (Y/N)')
+def move_file(action='Move'):
+    cmd = input(' ' + action + ' ' + str([s['path'] + splitter + s['file'] for s in selection]) + ' into current directory? (Y/N)')
     if cmd.lower().strip() == 'y':
         try:
             for s in selection:
-                shutil.move(s['path'] + splitter + s['file'], str(os.getcwd()) + splitter)
+                if action == 'Move':
+                    shutil.move(s['path'] + splitter + s['file'], str(os.getcwd()) + splitter)
+                elif action == 'Copy':
+                    shutil.copy(s['path'] + splitter + s['file'], str(os.getcwd()) + splitter)
             clear_selection()
-            print(' Moved.')
+            print(' Complete.')
         except Exception as E:
-            print(' Move error: ' + str(E))
+            print(' Error: ' + str(E))
     else:
-        print(' Not moved.')
+        print(' Not complete.')
+
 
 def exec_pacer():
-    cmd = input(' Command for current selections? (move, delete): ')
+    cmd = input(' Command for current selections? (move, copy, delete): ')
     if cmd.lower().strip() == 'move':
-        move_file()
+        move_file('Move')
+    elif cmd.lower().strip() == 'copy':
+        move_file('Copy')
     elif cmd.lower().strip() == 'delete':
         del_f()
     else:
