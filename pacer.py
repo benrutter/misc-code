@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import os
-import glob
 import sys
 import shutil
 import key_env
@@ -11,13 +10,12 @@ banner2 = r"   / __ \____ _________  _____"
 banner3 = r"  / /_/ / __ '/ __/ _  \/  __/"
 banner4 = r" / ____/ /_/ / /__   __/ /"
 banner5 = r"/_/    \__~_/\___/\___/_/"
-
-
 banner = [banner1,banner2,banner3,banner4,banner5]
 
+hidden = True
 selected = 0
 selection = []
-files = [f for f in glob.glob('*')]
+files = os.listdir()
 message = ''
 move_file = ''
 if os.name == 'nt':
@@ -26,59 +24,60 @@ else:
     splitter = '/'
 
 
-
 def clear():
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
 
-def show_menu(refresh_files=False):
+def show_menu():
+    
     global selected
     global files
-    if refresh_files:
-        files = [f for f in glob.glob('*')]
     term_columns = shutil.get_terminal_size().columns
     big = term_columns >170
+    col_size = 40
+    dynamic_size = max(10, shutil.get_terminal_size().lines - 20)
+    
     if big:
         margin = ' ' * int(term_columns/10)
     else:
         margin = ' '
-    line = '-' * term_columns
-    clear()
     if big:
-        for b in banner:
-            print(margin + b)
-        print(margin + 'Pacer is a console based file browser.\n' + margin + 'Explore and launch with vim keys. s for pacer commands, a for console commands.\n' + margin + 'Select and clear selection with f and d. Exit with q')
-        print(line)
+        line = '-' * term_columns
     else:
-        print(margin + 'Pacer')
-        print(margin + '- move with vim keys')
-        print(margin + '- select and clear with f and d')
-        print(margin + '- pacer command with s')
-        print(margin + '- run commands with a')
-        print(margin + '- exit with q')
-        print('')
+        line = ''
+    
+    clear()
+
+    for b in banner:
+        print(margin + b)
+    print('{}Pacer is a console based file browser.\n{}Vim keys: move, a: console command, s: pacer command\n{}f: select, d: clear, .: hidden, q: quit'.format(margin,margin,margin))
+    print(line)
 
     ### directory_list
 
+    files = os.listdir()
+    if hidden:
+        files = [f for f in files if f[0] != '.']
+
     selected_files = [s['file'] for s in selection if s['path'] == os.getcwd()]
-    curr_f = [f + ' ' * int(40-len(f)) if len(f) < 40 else '...' + f[-37:] for f in files]
+    curr_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else '...' + f[-(col_size-3):] for f in files]
 
     prev_sel = [s['file'] for s in selection if s['path'] == os.path.abspath(os.path.join(os.getcwd(), os.pardir))]
-    prev_f = [f for f in glob.glob('../*')]
-    prev_f = [f.split('\\',1)[-1] for f in prev_f]
-    prev_f = [f + ' ' * int(40-len(f)) if len(f) < 40 else '...' + f[-37:] for f in prev_f]
+    prev_f = os.listdir(os.pardir)   
+    prev_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else '...' + f[-(col_size-3):] for f in prev_f]
 
     try:
-        next_f = [f for f in glob.glob(files[min(max(0,selected),len(files)-1)] + '/*')]
-        next_f = [f.split(splitter,1)[-1] for f in next_f]
-        next_f = [f + ' ' * int(40-len(f)) if len(f) < 40 else f[-37:] + '...' for f in next_f]
         next_sel = [s['file'] for s in selection if s['path'] == os.getcwd() + splitter + files[min(max(0,selected),len(files)-1)]]
+        next_f = os.listdir(files[min(max(0,selected),len(files)-1)])
+        next_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[-(col_size-3):] + '...' for f in next_f]
     except:
         next_f = []
-
-    dynamic_size = max(10, shutil.get_terminal_size().lines - 20)
+    if hidden:
+        curr_f = [f for f in curr_f if f[0] != '.']
+        prev_f = [f for f in prev_f if f[0] != '.']
+        next_f = [f for f in next_f if f[0] != '.']
 
     selected = min(max(selected, 0),len(files)-1)
     file_range_trans = curr_f[max(0,selected-(dynamic_size-1)):]
@@ -86,7 +85,7 @@ def show_menu(refresh_files=False):
 
     for i in file_range:
 
-        # previour file
+        # previour directory
         if i >= 0 and i < len(prev_f):
             prev = prev_f[i]
             if prev.strip() in prev_sel:
@@ -94,9 +93,9 @@ def show_menu(refresh_files=False):
             else:
                 prev = ' ' + prev
         else:
-            prev = ' ' * 41
+            prev = ' ' * (col_size+1)
 
-        # current file
+        # current directory
         if selected == i or (selected > dynamic_size-1 and i == dynamic_size-1):
             cursor = ' >> '
         else:
@@ -112,11 +111,11 @@ def show_menu(refresh_files=False):
                 curr = cursor + curr_f[i]
                 curr = cursor + file_range_trans[i]
             else:
-                curr = cursor + (' ' * 40)
+                curr = cursor + (' ' * col_size)
         except:
-            curr = cursor + (' ' * 40)
+            curr = cursor + (' ' * col_size)
 
-        # next file
+        # next directory
         try:
             nxt = next_f[i]
             if nxt.strip() in next_sel:
@@ -124,31 +123,25 @@ def show_menu(refresh_files=False):
             else:
                 nxt = ' ' + nxt
         except:
-            nxt = (' ' * 41)
+            nxt = (' ' * (col_size+1))
 
         if big:
             print(margin + prev + margin + curr + margin + nxt)
         else:
             print(curr)
 
-    if big:
-        print('\n' + line)
-    if len(os.getcwd()) > 100:
-        print(margin + 'DIR: ...' + os.getcwd()[-97:])
-    else:
-        print(margin + 'DIR: ' + os.getcwd())
+    print('\n{}'.format(line))
+    print('{}DIR: {}'.format(margin, os.getcwd()))
     try:
-        if len(files[selected]) > 99:
-            print(margin + 'FILE: ...' + files[selected][-96:])
-        elif selected >= 0:
-            print(margin + 'FILE: ' + files[selected])
+        if selected >= 0:
+            print('{}FILE: {}'.format(margin, files[selected]))
         else:
-            print(margin + 'FILE: <NA>')
+            print('{}FILE: <NA>'.format(margin))
     except:
-        print(margin + 'FILE: <NA>')
-    print(margin + 'Selection: ' + str([s['file'] for s in selection]))
-    if big:
-        print(line)
+        print('{}FILE: <NA>'.format(margin))
+
+    print('{}SELECTION: {}'.format(margin, [s['file'] for s in selection]))
+    print(line)
 
 def move(num):
     global selected
@@ -157,47 +150,25 @@ def move(num):
     selected += num
     show_menu()
 
-
 def left():
-    global files
-    global message
     global selected
     try:
         os.chdir('..')
         selected = 0
-        message = ''
     except:
         pass
-    files = [f for f in glob.glob('*')]
     show_menu()
 
 def right():
-    global files
-    global message
     global selected
     try:
         os.chdir(files[selected])
         selected = 0
-        message = ''
     except:
-        try:
-            launch()
-        except:
-            message = ' Launch / Nav Error'
-    files = [f for f in glob.glob('*')]
-    show_menu()
-
-def launch():
-    global message
-    message = ' locked while file open'
-    show_menu()
-    os.system(files[selected])
-    message = ' unlocked!'
+        pass
     show_menu()
 
 def exec_int():
-    global message
-    message = ''
     show_menu()
     cmd = input(' Console Execute: ')
     os.system(cmd)
@@ -207,24 +178,20 @@ def quit():
     os._exit(0)
 
 def del_f():
-    global message
-    global files
-    message= ''
-    show_menu()
     cmd = input(' Delete ' + str([s['path'] + splitter + s['file'] for s in selection]) + '? (Y/N) ')
     if cmd.lower().strip() == 'y':
         for s in selection:
             try:
                 os.remove(s['path'] + splitter + s['file'])
+            except:
                 try:
                     shutil.rmtree(s['path'] + splitter + s['file'])
-                except:
-                    pass
-            except Exception as e:
-                print(' Deletion error (' + str(e) + ')')
+                except Exception as e:
+                    print(' Deletion error ({})'.format(str(e)))
         clear_selection()
     else:
         print(' Not deleted.')
+    show_menu()
 
 def select():
     global selection
@@ -238,10 +205,10 @@ def select():
 def clear_selection():
     global selection
     selection = []
-    show_menu(refresh_files = True)
+    show_menu()
 
 def move_file(action='Move'):
-    cmd = input(' ' + action + ' ' + str([s['path'] + splitter + s['file'] for s in selection]) + ' into current directory? (Y/N)')
+    cmd = input(' {} {} into current directory? (Y/N)'.format(action, [s['path'] + splitter + s['file'] for s in selection]))
     if cmd.lower().strip() == 'y':
         try:
             for s in selection:
@@ -255,9 +222,11 @@ def move_file(action='Move'):
             print(' Error: ' + str(E))
     else:
         print(' Not complete.')
+    show_menu()
 
 
 def exec_pacer():
+    show_menu()
     cmd = input(' Command for current selections? (move, copy, delete): ')
     if cmd.lower().strip() == 'move':
         move_file('Move')
@@ -267,6 +236,12 @@ def exec_pacer():
         del_f()
     else:
         print(' No action taken')
+    show_menu()
+
+def switch_hidden():
+    global hidden
+    hidden = not hidden
+    show_menu()
 
 key_mapping = {
     106: lambda: move(1),
@@ -277,7 +252,8 @@ key_mapping = {
     115: exec_pacer,
     102: select,
     100: clear_selection,
-    113: quit
+    113: quit,
+    46: switch_hidden
 }
 
 show_menu()
