@@ -3,7 +3,10 @@
 import os
 import sys
 import shutil
-import key_env
+if os.name == 'nt':
+    from msvcrt import getch
+else:
+    from getch import getch
 
 banner1 = r"    ____"
 banner2 = r"   / __ \____ _________  _____"
@@ -24,6 +27,14 @@ else:
     splitter = '/'
 
 
+def run_environment(function_mapping, exit_feature=True):
+    while True:
+        key = ord(getch())
+        if key == 27 and exit_feature:
+            break
+        elif key in function_mapping:
+            function_mapping[key]()
+
 def clear():
     if os.name == 'nt':
         os.system('cls')
@@ -31,14 +42,14 @@ def clear():
         os.system('clear')
 
 def show_menu():
-    
+
     global selected
     global files
     term_columns = shutil.get_terminal_size().columns
     big = term_columns >170
     col_size = 40
     dynamic_size = max(10, shutil.get_terminal_size().lines - 20)
-    
+
     if big:
         margin = ' ' * int(term_columns/10)
     else:
@@ -47,7 +58,7 @@ def show_menu():
         line = '-' * term_columns
     else:
         line = ''
-    
+
     clear()
 
     for b in banner:
@@ -62,22 +73,27 @@ def show_menu():
         files = [f for f in files if f[0] != '.']
 
     selected_files = [s['file'] for s in selection if s['path'] == os.getcwd()]
-    curr_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else '...' + f[-(col_size-3):] for f in files]
+    curr_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[:col_size-3] + '...' for f in files]
 
     prev_sel = [s['file'] for s in selection if s['path'] == os.path.abspath(os.path.join(os.getcwd(), os.pardir))]
-    prev_f = os.listdir(os.pardir)   
-    prev_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else '...' + f[-(col_size-3):] for f in prev_f]
+    prev_f = os.listdir(os.pardir)
+    prev_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[:col_size-3] + '...' for f in prev_f]
 
     try:
         next_sel = [s['file'] for s in selection if s['path'] == os.getcwd() + splitter + files[min(max(0,selected),len(files)-1)]]
         next_f = os.listdir(files[min(max(0,selected),len(files)-1)])
-        next_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[-(col_size-3):] + '...' for f in next_f]
+        next_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[:col_size-3] + '...' for f in next_f]
     except:
         next_f = []
     if hidden:
         curr_f = [f for f in curr_f if f[0] != '.']
         prev_f = [f for f in prev_f if f[0] != '.']
         next_f = [f for f in next_f if f[0] != '.']
+
+    files.sort()
+    curr_f.sort()
+    prev_f.sort()
+    next_f.sort()
 
     selected = min(max(selected, 0),len(files)-1)
     file_range_trans = curr_f[max(0,selected-(dynamic_size-1)):]
@@ -257,4 +273,4 @@ key_mapping = {
 }
 
 show_menu()
-key_env.run_environment(key_mapping, exit_feature=False)
+run_environment(key_mapping, exit_feature=False)
