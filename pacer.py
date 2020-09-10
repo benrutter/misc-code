@@ -26,7 +26,6 @@ if os.name == 'nt':
 else:
     splitter = '/'
 
-
 def run_environment(function_mapping, exit_feature=True):
     while True:
         key = ord(getch())
@@ -59,6 +58,8 @@ def show_menu():
     else:
         line = ''
 
+    col_size = max(37, int((term_columns/3)-len(margin)-3))
+
     clear()
 
     for b in banner:
@@ -71,13 +72,16 @@ def show_menu():
     files = os.listdir()
     if hidden:
         files = [f for f in files if f[0] != '.']
+    files.sort()
 
     selected_files = [s['file'] for s in selection if s['path'] == os.getcwd()]
     curr_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[:col_size-3] + '...' for f in files]
+    curr_f.sort()
 
     prev_sel = [s['file'] for s in selection if s['path'] == os.path.abspath(os.path.join(os.getcwd(), os.pardir))]
     prev_f = os.listdir(os.pardir)
     prev_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[:col_size-3] + '...' for f in prev_f]
+    prev_f.sort()
 
     try:
         next_sel = [s['file'] for s in selection if s['path'] == os.getcwd() + splitter + files[min(max(0,selected),len(files)-1)]]
@@ -85,15 +89,12 @@ def show_menu():
         next_f = [f + ' ' * int(col_size-len(f)) if len(f) < col_size else f[:col_size-3] + '...' for f in next_f]
     except:
         next_f = []
+    next_f.sort()
+
     if hidden:
         curr_f = [f for f in curr_f if f[0] != '.']
         prev_f = [f for f in prev_f if f[0] != '.']
         next_f = [f for f in next_f if f[0] != '.']
-
-    files.sort()
-    curr_f.sort()
-    prev_f.sort()
-    next_f.sort()
 
     selected = min(max(selected, 0),len(files)-1)
     file_range_trans = curr_f[max(0,selected-(dynamic_size-1)):]
