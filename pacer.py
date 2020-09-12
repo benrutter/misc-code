@@ -98,6 +98,7 @@ def show_menu():
 
     selected = min(max(selected, 0),len(files)-1)
     file_range_trans = curr_f[max(0,selected-(dynamic_size-1)):]
+    files_trans = files[max(0,selected-(dynamic_size-1)):]
     file_range = range(0,dynamic_size)
 
     for i in file_range:
@@ -118,7 +119,7 @@ def show_menu():
         else:
             cursor = '    '
 
-        if i < len(files) and files[i] in selected_files:
+        if i < len(files) and files_trans[i] in selected_files:
             cursor = cursor + '*'
         else:
             cursor = cursor + ' '
