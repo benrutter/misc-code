@@ -61,7 +61,7 @@ paddle = Paddle({'x':board['size']['x']/2, 'y': board['size']['y']-50}, board['s
 screen = pygame.display.set_mode((board['size']['x'], board['size']['y']))
 being_played = True
 
-#font = pygame.font.Font('freesansbold.ttf', 32) 
+font = pygame.font.Font('freesansbold.ttf', 32) 
 
 
 clock = pygame.time.Clock()
@@ -73,15 +73,15 @@ while being_played == True:
 
         screen.fill((0, 0, 0))
 
-        #if ball.count > 0:
-        #    message = str(ball.count)
-        #else:
-        #    message = 'You are terrible at life.'
+        if ball.count > 0:
+            message = str(ball.count)
+        else:
+            message = 'You are terrible at life.'
 
-        #text = font.render(message, True, (255, 255, 255), (0, 0, 0)) 
-        #text_box = text.get_rect() 
-        #text_box.center = (int(board['size']['x']/2), int(board['size']['y']/2))
-        #screen.blit(text, text_box)
+        text = font.render(message, True, (255, 255, 255), (0, 0, 0)) 
+        text_box = text.get_rect() 
+        text_box.center = (int(board['size']['x']/2), int(board['size']['y']/2))
+        screen.blit(text, text_box)
 
         paddle.move(pygame.key.get_pressed(), board['size'])
         pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(int(paddle.location['x']) , int(paddle.location['y']), int(paddle.size['x']), int(paddle.size['y'])))
