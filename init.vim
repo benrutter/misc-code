@@ -11,11 +11,17 @@ Plug 'junegunn/goyo.vim'
 Plug 'tpope/vim-sensible'
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'jiangmiao/auto-pairs'
 Plug 'sheerun/vim-polyglot'
 Plug 'chrisbra/Colorizer'
 Plug 'psliwka/vim-smoothie'
+Plug 'w0rp/ale'
+Plug 'ncm2/ncm2'
+Plug 'roxma/nvim-yarp'
+Plug 'ncm2/ncm2-bufword'
+Plug 'ncm2/ncm2-path'
+Plug 'ncm2/ncm2-jedi'
+Plug 'Chiel92/vim-autoformat'
 call plug#end()
 
 """ Main Configurations
@@ -45,34 +51,11 @@ set termguicolors
 
 """ Plugin Configurations
 
+" Deoplete
+let g:deoplete#enable_at_startup = 1
+
 " NERDTree
-let NERDTreeShowHidden=1
-" Exit Vim if NERDTree is the only window left.
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-
-" Airline
-" let g:airline_powerline_fonts = 1
-" let g:airline_section_z = ' %{strftime("%-I:%M %p")}'
-" let g:airline_section_warning = ''
-"let g:airline#extensions#tabline#enabled = 1 " Uncomment to display buffer tabline above
-
-" vim-pydocstring
-let g:pydocstring_doq_path = '~/.config/nvim/env/bin/doq'
-
-" Supertab
-let g:SuperTabDefaultCompletionType = "<C-n>"
-
-" EasyAlign
-xmap ga <Plug>(EasyAlign)
-nmap ga <Plug>(EasyAlign)
-
-" indentLine
-let g:indentLine_char = '▏'
-let g:indentLine_defaultGroup = 'NonText'
-" Disable indentLine from concealing json and markdown syntax (e.g. ```)
-let g:vim_json_syntax_conceal = 0
-let g:vim_markdown_conceal = 0
-let g:vim_markdown_conceal_code_blocks = 0
+let NERDTreeShowHidden=0
 
 " Startify
 let g:startify_fortune_use_unicode = 1
@@ -85,6 +68,28 @@ autocmd VimEnter *
     \ |   wincmd w
     \ | endif
 
+" vim-autoformat
+noremap <F3> :Autoformat<CR>
+
+" NCM2
+augroup NCM2
+  autocmd!
+  " enable ncm2 for all buffers
+  autocmd BufEnter * call ncm2#enable_for_buffer()
+  " :help Ncm2PopupOpen for more information
+  set completeopt=noinsert,menuone,noselect
+  " When the <Enter> key is pressed while the popup menu is visible, it only
+  " hides the menu. Use this mapping to close the menu and also start a new line.
+  inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+augroup END
+
+" Ale
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_echo_msg_error_str = 'E'
+let g:ale_echo_msg_warning_str = 'W'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ale_linters = {'python': ['flake8']}
 
 " context.vim
 let g:context_nvim_no_redraw =1
@@ -92,6 +97,8 @@ let g:context_nvim_no_redraw =1
 """ Filetype-Specific Configurations
 " Markdown
 autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
+" Python
+autocmd FileType python imap <buffer> <Space><F5> <esc>:w<CR>:exec '!clear' <CR>:exec '!python' shellescape(@% 1)<CR>
 
 let g:lightline = {
       \ 'colorscheme': 'one',
