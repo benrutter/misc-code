@@ -1,17 +1,21 @@
 """ Plugins!
-call plug#begin('C:\Users\Brutter1\AppData\Local\nvim\plugged')
+call plug#begin('C:\Users\Ben.Rutter\AppData\Local\nvim\plugged')
 Plug 'navarasu/onedark.nvim'
-Plug 'junegunn/vim-journal'
-Plug 'itchyny/lightline.vim'
-Plug 'junegunn/rainbow_parentheses.vim'
-Plug 'nightsense/forgotten'
+Plug 'pineapplegiant/spaceduck'
+Plug 'sainnhe/everforest'
+Plug 'karoliskoncevicius/sacredforest-vim'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'glepnir/oceanic-material'
+Plug 'ghifarit53/tokyonight-vim'
+Plug 'jnurmine/zenburn'
+Plug 'dikiaap/minimalist'
 Plug 'arcticicestudio/nord-vim'
+Plug 'itchyny/lightline.vim'
 Plug 'mhinz/vim-startify'
 Plug 'junegunn/goyo.vim'
 Plug 'tpope/vim-sensible'
 Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'jiangmiao/auto-pairs'
 Plug 'sheerun/vim-polyglot'
 Plug 'chrisbra/Colorizer'
 Plug 'psliwka/vim-smoothie'
@@ -22,6 +26,8 @@ Plug 'ncm2/ncm2-bufword'
 Plug 'ncm2/ncm2-path'
 Plug 'ncm2/ncm2-jedi'
 Plug 'Chiel92/vim-autoformat'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'airblade/vim-gitgutter'
 call plug#end()
 
 """ Main Configurations
@@ -31,7 +37,7 @@ set incsearch ignorecase smartcase hlsearch
 set wildmode=longest,list,full wildmenu
 set ruler laststatus=2 showcmd showmode
 set list listchars=trail:»,tab:»-
-set fillchars+=vert:\ 
+set fillchars+=vert:\
 set wrap breakindent
 set encoding=utf-8
 set textwidth=0
@@ -44,7 +50,7 @@ set mouse=a
 
 " Main Coloring Configurations
 syntax on
-colorscheme onedark
+colorscheme everforest
 
 " Enable True Color Support (ensure you're using a 256-color enabled $TERM, e.g. xterm-256color)
 set termguicolors
@@ -63,6 +69,7 @@ let g:startify_fortune_use_unicode = 1
 " Startify + NERDTree on start when no file is specified
 autocmd VimEnter *
     \   if !argc()
+    \ | cd C:\Users\Ben.Rutter\OneDrive - Flexitricity\Documents
     \ |   Startify
     \ |   NERDTree
     \ |   wincmd w
@@ -101,7 +108,7 @@ autocmd FileType markdown setlocal shiftwidth=2 tabstop=2 softtabstop=2
 autocmd FileType python imap <buffer> <Space><F5> <esc>:w<CR>:exec '!clear' <CR>:exec '!python' shellescape(@% 1)<CR>
 
 let g:lightline = {
-      \ 'colorscheme': 'one',
+      \ 'colorscheme': 'everforest',
       \ 'active': {
       \   'left': [ ['mode'] ],
       \ },
@@ -119,6 +126,12 @@ endfunction
 """ Custom Mappings
 
 let mapleader=","
-nmap <leader>m :NERDTreeToggle<CR>
-nmap <leader>t :call TrimWhitespace()<CR>
+nmap <leader>t :NERDTreeToggle<CR>
+nmap <leader>w :call TrimWhitespace()<CR>
 nmap <leader>z :Goyo<CR>
+nmap <leader>m :MarkdownPreviewToggle<CR>
+
+""" neovide specifics
+set guifont=JetBrains\ Mono:h10
+let g:neovide_custer_animation_length=0.04
+let g:neovide_cursor_trail_size = 0.4
